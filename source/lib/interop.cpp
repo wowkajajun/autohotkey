@@ -200,7 +200,7 @@ BIF_DECL(BIF_NumPut)
 
 		// See comments in NumGet about the following section:
 		if (!op.num_size
-			|| !TokenIsNumeric(token_to_write)
+			|| !(TokenIsNumeric(token_to_write) || (op.is_integer && op.num_size == sizeof(void*) && TypeOfToken(*aParam[n_param]) == SYM_OBJECT)) // Validate for numbers OR whether the type name is Ptr and value is an object (checking for the Ptr property is done later on)
 			|| op.target < 65536 // Basic sanity check to catch incoming raw addresses that are zero or blank.  On Win32, the first 64KB of address space is always invalid.
 			|| num_end > op.right_side_bound) // i.e. it's ok if target+size==right_side_bound because the last byte to be read is actually at target+size-1. In other words, the position of the last possible terminator within the variable's capacity is considered an allowable address.
 		{
@@ -217,7 +217,15 @@ BIF_DECL(BIF_NumPut)
 		// Note that since v2.0-a083-97803aeb, TokenToInt64 supports conversion of large unsigned 64-bit
 		// numbers from strings (producing a negative value, but with the right bit representation).
 		if (op.is_integer)
-			num_i64 = TokenToInt64(token_to_write);
+		{
+			if (TypeOfToken(*aParam[n_param]) == SYM_OBJECT) // Allow objects with "Ptr" property
+			{
+				if (!GetObjectIntProperty(ParamIndexToObject(n_param), _T("Ptr"), num_i64, aResultToken))
+					_f_throw_value(ERR_PARAM_INVALID);
+			}
+			else
+				num_i64 = TokenToInt64(token_to_write);
+		}
 		else
 		{
 			num_f64 = TokenToDouble(token_to_write);
