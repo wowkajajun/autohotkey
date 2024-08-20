@@ -268,6 +268,7 @@ VarEntry g_BIV_A[] =
 	A_(Temp), // Debatably should be A_TempDir, but brevity seemed more popular with users, perhaps for heavy uses of the temp folder.,
 	A_(ThisFunc),
 	A_(ThisHotkey),
+	A_(ThreadId),
 	A_(TickCount),
 	A_x(TimeIdle, BIV_TimeIdle),
 	A_x(TimeIdleKeyboard, BIV_TimeIdle),
