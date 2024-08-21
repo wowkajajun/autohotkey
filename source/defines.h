@@ -101,6 +101,8 @@ GNU General Public License for more details.
 #define GET_BIT(buf,n) (((buf) & (1 << (n))) >> (n))
 #define SET_BIT(buf,n,val) ((val) ? ((buf) |= (1<<(n))) : (buf &= ~(1<<(n))))
 
+#define THREADID_INDEX 0xFFF
+
 // FAIL = 0 to remind that FAIL should have the value zero instead of something arbitrary
 // because some callers may simply evaluate the return result as true or false
 // (and false is a failure):
@@ -910,7 +912,9 @@ struct ScriptThreadState
 	int UninterruptedLineCount; // Stored as a g-struct attribute in case OnExit func interrupts it while uninterruptible.
 	int UninterruptibleDuration; // Must be int to preserve negative values found in g_script.mUninterruptibleTime.
 	DWORD ThreadStartTime;
-	UINT ThreadId; // Lower 12 bits contain the 1-based index of the thread in g_array, higher 20 bits contain g_script.mTotalThreadCount at the time of creation (overflows after 1048576 threads).
+
+	UINT ThreadId; // Lower 12 bits contains the value of g_nThreads, higher 20 bits contain g_script.mTotalThreadCount at the time of creation (overflows after 1048576 threads).
+	bool IsMarkedEarlyExit; // Set by Exit() if a thread id is provided to terminate underlying threads
 
 	bool IsPaused;
 	bool MsgBoxTimedOut; // Meaningful only while a MsgBox call is in progress.
