@@ -1185,9 +1185,9 @@ ResultType Script::Reload(bool aDisplayErrors)
 
 
 
-bif_impl FResult Exit(optl<int> aExitCode, optl<UINT> aThreadId, ResultToken& aResultToken)
+bif_impl FResult Exit(optl<int> aExitCode, optl<INT64> aThreadId, ResultToken& aResultToken)
 {
-	UINT uThreadId = aThreadId.value_or(g->ThreadId); // Default is the currently running thread
+	INT64 uThreadId = aThreadId.value_or(g->ThreadId); // Default is the currently running thread
 	int nCurrentThreadIndex = g->ThreadId & THREADID_INDEX;
 	int nTargetThreadIndex = uThreadId & THREADID_INDEX;
 	aResultToken.SetValue(0); // Default return value
@@ -1200,12 +1200,12 @@ bif_impl FResult Exit(optl<int> aExitCode, optl<UINT> aThreadId, ResultToken& aR
 	if (g_script.mAutoExecSectionIsRunning)
 		--nTargetThreadIndex; 
 
-	UINT uThreadIdAtIndex = g_array[nTargetThreadIndex].ThreadId;
+	INT64 uThreadIdAtIndex = g_array[nTargetThreadIndex].ThreadId;
 	if (!uThreadIdAtIndex || g_array[nTargetThreadIndex].IsMarkedEarlyExit)
 		return OK; // The target thread has already been marked to exit
 
 	// Return 0 if the thread id at the specified index isn't the target thread, and the target thread isn't a plain index
-	if ((uThreadIdAtIndex != uThreadId) && (uThreadId >> 12))
+	if ((uThreadIdAtIndex != uThreadId) && (uThreadId >> 16))
 		return OK;
 
 	aResultToken.SetValue(uThreadIdAtIndex);
