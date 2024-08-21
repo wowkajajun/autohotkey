@@ -147,6 +147,9 @@ UINT_PTR CALLBACK RegisterCallbackCStub(UINT_PTR *params, char *address) // Used
 	}
 	else
 	{
+		if (!g->ThreadId)
+			g->IsMarkedEarlyExit = 1;
+
 		if (g == g_array && !g_script.mAutoExecSectionIsRunning)
 			// If the function just called used thread #0 and the AutoExec section isn't running, that means
 			// the AutoExec section definitely didn't launch or control the callback (even if it is running,
