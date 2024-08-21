@@ -1041,7 +1041,7 @@ inline void global_init(global_struct &g)
 {
 	global_clear_state(g);
 	global_set_defaults(g);
-	g.ThreadId = 1; // Set the auto-execute thread id to 1
+	g.ThreadId = (1 << 16) | 1; // Set the auto-execute thread id to 65537
 }
 
 
