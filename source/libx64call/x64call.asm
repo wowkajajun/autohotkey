@@ -44,6 +44,9 @@ PerformDynaCall proc frame
 	; r8:  pointer to arguments to be passed by registers
 	; r9:  target function pointer
 
+	test rcx, rcx
+	jz save_func_address
+
 	; Setup stack frame by subtracting the size of the arguments
 	sub rsp, rcx
 
@@ -54,13 +57,14 @@ PerformDynaCall proc frame
 	sub rsi, rax
 	sub rsp, rsi
 
-	; Save function address
-	mov rax, r9
-
 	; Copy the stack arguments
 	mov rsi, rdx ; let rsi point to the arguments.
 	mov rdi, rsp ; store pointer to beginning of stack arguments in rdi (for rep movsb).
 	rep movsb    ; @@@ should be optimized (e.g. movq)
+
+save_func_address:
+	; Save function address
+	mov rax, r9
 
 	; Copy the register arguments
 	mov rcx,  qword ptr[r8   ] ; copy first four arguments to rcx, rdx, r8, r9 and xmm0-xmm3.
